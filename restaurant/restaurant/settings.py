@@ -42,7 +42,14 @@ INSTALLED_APPS = [
     'products',
     'drf_spectacular',
     'drf_spectacular_sidecar',
+    'customers',
 ]
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
