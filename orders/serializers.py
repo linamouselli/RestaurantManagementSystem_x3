@@ -17,11 +17,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def validate_items(self, value):
         for item in value:
-            product = item['product']
-            if not product.is_available:
-                raise serializers.ValidationError(
-                    f"Product {product.name} is not available."
-                )
+            if not item['product'].is_available:
+                raise serializers.ValidationError(f"{item['product'].name} unavailable")
         return value
 
     def create(self, validated_data):

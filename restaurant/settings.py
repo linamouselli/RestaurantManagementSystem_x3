@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'products',
     'customers',
-    'orders',
+    'orders.apps.OrdersConfig',
     'drf_spectacular',
     'drf_spectacular_sidecar',
 ]
