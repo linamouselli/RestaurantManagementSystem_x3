@@ -1,12 +1,36 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.parsers import MultiPartParser, FormParser
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from .models import Customer
 from .serializers import CustomerSerializer
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="List all customers",
+        description="Retrieve a list of all customers in our restaurant.",
+        responses={200: CustomerSerializer(many=True)},
+    ),
+    retrieve=extend_schema(
+        summary="Get customer details",
+        description="Retrieve details of a specific customer by ID.",
+    ),
+    create=extend_schema(
+        summary="Create a new customer",
+        description="Add a new customer to our restaurant.",
+    ),
+    update=extend_schema(
+        summary="Update a customer",
+        description="Update all fields of a specific customer.",
+    ),
+    destroy=extend_schema(
+        summary="Delete a customer",
+        description="Remove a customer from the restaurant.",
+    ),
+)
 class CustomerViewSet(ModelViewSet):
     """
     Customer Management API
@@ -23,49 +47,8 @@ class CustomerViewSet(ModelViewSet):
     Authentication:
     - Requires JWT Authentication
     """
-
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_summary="Get all customers",
-        operation_description="Retrieve a list of all registered customers.",
-        responses={200: CustomerSerializer(many=True)}
-    )
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
 
-    @swagger_auto_schema(
-        operation_summary="Create new customer",
-        operation_description="Create a new customer with personal information.",
-        request_body=CustomerSerializer,
-        responses={201: CustomerSerializer}
-    )
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-
-    @swagger_auto_schema(
-        operation_summary="Get customer by ID",
-        operation_description="Retrieve details of a specific customer using ID.",
-        responses={200: CustomerSerializer}
-    )
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
-
-    @swagger_auto_schema(
-        operation_summary="Update customer",
-        operation_description="Update all customer fields.",
-        request_body=CustomerSerializer,
-        responses={200: CustomerSerializer}
-    )
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
-
-    @swagger_auto_schema(
-        operation_summary="Delete customer",
-        operation_description="Delete a customer permanently.",
-        responses={204: "Customer deleted successfully"}
-    )
-    def destroy(self, request, *args, **kwargs):
-        return super().destroy(request, *args, **kwargs)
