@@ -41,7 +41,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'products',
     'customers',
-    'orders.apps.OrdersConfig',
+    'orders',
+    'users',
+    'django_filters',
     'drf_spectacular',
     'drf_spectacular_sidecar',
 ]
@@ -123,6 +125,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+AUTH_USER_MODEL = 'users.CustomUser'
+
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_RENDERER_CLASSES': ["rest_framework.renderers.JSONRenderer"],
@@ -132,6 +136,10 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.AllowAny",
     ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5,
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+
 }
 
 SIMPLE_JWT = {
