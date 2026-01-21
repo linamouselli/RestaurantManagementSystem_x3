@@ -1,11 +1,9 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.permissions import AllowAny, IsAdminUser
-from rest_framework.parsers import MultiPartParser, FormParser
 from drf_spectacular.utils import extend_schema, extend_schema_view
-
-from .models import Customer
-from .serializers import CustomerSerializer
+from users.permissions import IsAdmin, IsManager, IsStaff
+from customers.models import Customer
+from customers.serializers import CustomerSerializer
 
 
 @extend_schema_view(
@@ -52,3 +50,7 @@ class CustomerViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [IsManager()]
+        return [IsAdmin()]

@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from rest_framework import viewsets, filters
 
-from .models import Category, Product
-from .serializers import CategorySerializer, ProductSerializer
+from products.models import Category, Product
+from products.serializers import CategorySerializer, ProductSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import AllowAny, IsAdminUser
-from users.permissions import IsAdmin, IsManager, IsStaff
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from users.permissions import IsAdmin, IsManager, IsAdminOrManager, IsStaff
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 # Create your views here.
@@ -42,7 +42,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [AllowAny()]
-        return [IsAdmin(), IsManager()]
+        return [IsAdminOrManager()]
 
 
 @extend_schema_view(
@@ -78,9 +78,9 @@ class ProductViewSet(viewsets.ModelViewSet):
     search_fields = ['name']
 
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve', 'available_products']:
             return [AllowAny()]
-        return [IsAdmin(), IsManager()]
+        return [IsAdminOrManager()]
 
 
     @action(detail=False, methods=['get'], url_path='available')

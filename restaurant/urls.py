@@ -12,7 +12,7 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    path('api/products/', include('products.urls')),
+    path('api/', include('products.urls')),
     path('api/orders/', include('orders.urls')),
     path('api/customers/', include('customers.urls')),
     path('api/users/', include('users.urls')),

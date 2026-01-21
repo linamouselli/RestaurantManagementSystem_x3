@@ -147,9 +147,9 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
-SEPCTACULAR_SETTINGS = {
-    "TITLE" : "CRUD API",
-    "DESCRIPTION" : "Simple CRUD API for Books using Django REST Framework.",
+SPECTACULAR_SETTINGS = {
+    "TITLE" : "Restaurant API",
+    "DESCRIPTION" : "Restaurant management system API",
     "VERSION" : "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
