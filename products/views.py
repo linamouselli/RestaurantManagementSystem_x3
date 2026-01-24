@@ -84,6 +84,11 @@ class ProductViewSet(viewsets.ModelViewSet):
             return [AllowAny()]
         return [IsAdminOrManager()]
 
+    @extend_schema(
+        summary="List available products",
+        description="Retrieve a list of products that are currently available (is_available=True).",
+        responses={200: ProductSerializer(many=True)}
+    )
 
     @action(detail=False, methods=['get'], url_path='available')
     def available_products(self, request):
