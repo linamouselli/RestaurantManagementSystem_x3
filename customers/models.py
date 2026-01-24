@@ -25,13 +25,21 @@ class Customer(models.Model):
     address = models.TextField()
     registration_date = models.DateTimeField(auto_now_add=True)
 
-    def clean(self):
+    class Meta:
+        ordering = ['id']
 
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
+    def clean(self):
         if len(self.first_name) < 2:
             raise ValidationError("First name must be at least 2 characters long.")
 
         if len(self.last_name) < 2:
             raise ValidationError("Last name must be at least 2 characters long.")
 
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+

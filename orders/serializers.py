@@ -4,18 +4,20 @@ from products.models import Product
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source='product.name', read_only=True)
+
     class Meta:
         model = OrderItem
-        fields = ['product', 'quantity']
+        fields = ['product' , 'product_name',  'quantity']
 
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
+    total_amount = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'customer', 'status', 'total_amount', 'notes', 'items']
-        read_only_fields = ['total_amount']
+        fields = ['id', 'customer','order_date' , 'status', 'total_amount', 'notes', 'items']
 
     def validate_items(self, value):
         for item in value:
@@ -36,3 +38,28 @@ class OrderSerializer(serializers.ModelSerializer):
         order.total_amount = total
         order.save()
         return order
+
+
+class OrderStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['status']
+
+    def validate_status(self, value):
+        allowed = ['New', 'Preparing', 'Ready', 'Delivered']
+        if value not in allowed:
+            raise serializers.ValidationError(
+                f"Status must be one of {allowed}"
+            )
+
+        order = self.instance
+        if order:
+            current_index = allowed.index(order.status)
+            new_index = allowed.index(value)
+
+            if new_index != current_index + 1:
+                raise serializers.ValidationError(
+                    f"Status must progress step by step: {order.status} → {value}"
+                )
+
+        return value

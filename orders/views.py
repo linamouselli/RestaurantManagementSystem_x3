@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from orders.models import Order
-from orders.serializers import OrderSerializer
+from orders.serializers import OrderSerializer, OrderStatusSerializer
 from rest_framework.permissions import IsAuthenticated
 from users.permissions import IsAdmin, IsManager, IsStaff, IsAdminOrManager
 from drf_spectacular.utils import extend_schema, extend_schema_view
@@ -32,27 +32,27 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 )
 
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
+    queryset = Order.objects.all().order_by('-order_date')
     serializer_class = OrderSerializer
     filterset_fields = ['customer', 'status']
     permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post', 'put']
 
-    @action(detail=True, methods=['put'], permission_classes=[IsAdminOrManager()])
-    def update_status(self, request, pk=None):
+    @action(
+        detail=True,
+        methods=['put'],
+        permission_classes=[IsAdminOrManager],
+        url_path='status'
+    )
+    def status(self, request, pk=None):
         order = self.get_object()
-        new_status = request.data.get('status')
-        if new_status in ['New', 'Preparing', 'Ready', 'Delivered']:
-            order.status = new_status
-            order.save()
-            return Response({'status': 'updated'})
-        return Response({'error': 'invalid status'}, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(detail=False, methods=['get'])
-    def by_customer(self, request):
-        customer_id = request.query_params.get('customer_id')
-        if not customer_id:
-            return Response({'error': 'customer_id is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        orders = Order.objects.filter(customer_id=customer_id)
-        serializer = self.get_serializer(orders, many=True)
-        return Response(serializer.data)
+        serializer = OrderStatusSerializer(order, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            {
+                "message": "Order status updated successfully",
+                "order": serializer.data
+            },
+            status=status.HTTP_200_OK
+        )

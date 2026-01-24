@@ -3,6 +3,8 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from customers.models import Customer
+from django.urls import reverse
+
 
 User = get_user_model()
 
@@ -37,7 +39,7 @@ class CustomerAPITest(APITestCase):
             "address": "Damascus"
         }
 
-        self.url = "/api/customers/customers/"
+        self.url = "/api/customers/"
 
     def test_admin_can_create_customer(self):
         self.client.force_authenticate(user=self.admin)

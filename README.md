@@ -1,9 +1,9 @@
 # Restaurant Management System API
 
 ## 📌 Description
-This Django REST API is designed for a simple restaurant management system.
+This Django REST API Final Project is designed for a simple restaurant management system.
 It allows managing **customers, products, categories, orders, and users**.
-The API supports role-based permissions, JWT authentication, pagination, and filtering.
+The API supports role-based permissions, Simple JWT authentication, pagination, and filtering.
 
 ---
 
@@ -13,26 +13,42 @@ RestaurantManagementSystem_x/
 │   ├── models.py
 │   ├── serializers.py
 │   ├── views.py
-│   ├── permissions.py
+│   ├── tests.py
 │   └── urls.py
 ├── orders/
 │   ├── models.py
 │   ├── serializers.py
 │   ├── views.py
-│   ├── permissions.py
+│   ├── tests.py
 │   └── urls.py
+│   └── admin.py
+
 ├── products/
 │   ├── models.py
 │   ├── serializers.py
 │   ├── views.py
+│   └── tests.py
 │   └── urls.py
+│   └── admin.py
+
+
 ├── users/
 │   ├── models.py
 │   ├── serializers.py
 │   ├── views.py
+│   └── permissions.py
+│   └── tests.py
 │   └── urls.py
+│   └── admin.py
+
+
+
 ├── restaurant/
+│   └── asgi.py
+│   └── settings.py
 │   └── urls.py
+│   └── wsgi.py
+
 ├── manage.py
 ├── requirements.txt
 └── README.md
@@ -105,6 +121,7 @@ RestaurantManagementSystem_x/
 | GET | /customers/{id}/ | Retrieve customer details |
 | PUT | /customers/{id}/ | Update customer |
 | DELETE | /customers/{id}/ | Delete customer |
+PATCH NOT INCLUDED
 **Permissions**: Admin=CRUD, Manager=Read only, Staff=None
 
 ### Products
@@ -116,6 +133,7 @@ RestaurantManagementSystem_x/
 | PUT | /products/{id}/ | Update product |
 | DELETE | /products/{id}/ | Delete product |
 | GET | /products/available/ | List available products |
+PATCH NOT INCLUDED
 **Permissions**: Admin=CRUD, Manager=CRUD, Staff=Read only for list/retrieve
 
 ### Categories
@@ -126,6 +144,7 @@ RestaurantManagementSystem_x/
 | GET | /categories/{id}/ | Get category details |
 | PUT | /categories/{id}/ | Update category |
 | DELETE | /categories/{id}/ | Delete category |
+PATCH NOT INCLUDED
 **Permissions**: Admin=CRUD, Manager=CRUD, Staff=None for modification
 
 ### Orders
@@ -135,28 +154,27 @@ RestaurantManagementSystem_x/
 | POST | /orders/ | Create new order |
 | GET | /orders/{id}/ | Retrieve order details |
 | PUT | /orders/{id}/status/ | Update order status |
+PATCH & DELETE NOT INCLUDED
 **Permissions**: Admin=CRUD, Manager=CRUD, Staff=Create/View only
 
 ### Users
 | Method | Endpoint | Description |
 |--------|---------|------------|
-| POST | /users/register/ | Register new user |
 | POST | /users/login/ | Login and receive JWT |
 | GET | /users/profile/ | Retrieve own profile |
-**Permissions**: Open for registration/login, profile requires authentication
+**Permissions**: profile requires authentication
 
 ---
 
 ## 🔐 Authentication
-- JWT Authentication implemented via **djangorestframework-simplejwt**
+- Simple JWT Authentication implemented via **djangorestframework-simplejwt**
 - Protected endpoints require Authorization header:
 Authorization: Bearer <access_token>
 
 ---
 
 ## 📑 Pagination
-- **Customers**: 5 items per page  
-- **Products**: Optional, can be extended  
+-  5 items per page  
 - Implemented using `PageNumberPagination` in DRF
 
 ---
@@ -165,13 +183,12 @@ Authorization: Bearer <access_token>
 - Products: filter by `category__name`, `price`  
 - Orders: filter by `customer`, `status`  
 - Products: search by `name`
-
----
+- ---
 
 ## ⚙️ Installation
 ```bash
-git clone <repo_url>
-cd RestaurantManagementSystem_x
+git clone https://github.com/linamouselli/RestaurantManagementSystem_x3.git
+cd RestaurantManagementSystem_x3
 python -m venv venv
 # Linux/Mac
 source venv/bin/activate
@@ -185,6 +202,7 @@ djangorestframework-simplejwt
 django-filter
 drf-spectacular
 
+python manage.py makemigrations
 python manage.py migrate
 python manage.py runserver
 
@@ -198,6 +216,19 @@ Admin can manage everything
 Manager can manage products/categories and view orders/customers
 Staff can only create/view orders and view products/categories
 
+## Category API Tests
+1- Anyone can list categories
+2- Admin can create categories
+3- Staff cannot create category
+
+## Product API Tests
+
+1- Anyone can list products
+2- Invalid price rejected
+3- Inactive category rejected
+4- Admin can create valid product
+5- Available products endpoint returns only available
+6- Staff cannot create product
 
 ## Customer API Tests
 
@@ -207,7 +238,18 @@ Staff can only create/view orders and view products/categories
 4-Invalid phone rejected
 5-First name min length rejected
 
+## Order API Tests
+
+1- Staff can create order
+2- Cannot order unavailable product
+3- Authenticated user can list orders
+4- Admin can update order status step by step
+5- Admin cannot skip status steps (e.g., New → Ready) 
+6- Invalid status rejected
+7- Staff cannot update order status
+
 
 python manage.py test
-
-python manage.py test customers.tests.test_customer_api
+python manage.py test products 
+python manage.py test customers 
+python manage.py test orders

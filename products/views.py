@@ -36,8 +36,9 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
     ),
 )
 class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by('id')
     serializer_class = CategorySerializer
+    http_method_names = ['get', 'post', 'put', 'delete']
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -70,8 +71,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
 )
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by('id')
     serializer_class = ProductSerializer
+    http_method_names = ['get', 'post', 'put', 'delete']
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['category__name', 'price']
@@ -86,6 +88,10 @@ class ProductViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='available')
     def available_products(self, request):
         available = Product.objects.filter(is_available=True)
+        page = self.paginate_queryset(available)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(available, many=True)
         return Response(serializer.data)
 
