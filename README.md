@@ -197,3 +197,17 @@ Product availability is updated when ordered
 Admin can manage everything
 Manager can manage products/categories and view orders/customers
 Staff can only create/view orders and view products/categories
+
+
+## Customer API Tests
+
+1-Admin can create customer
+2-Manager can view customers
+3-Staff cannot access customers
+4-Invalid phone rejected
+5-First name min length rejected
+
+
+python manage.py test
+
+python manage.py test customers.tests.test_customer_api
